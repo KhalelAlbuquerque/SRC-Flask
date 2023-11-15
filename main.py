@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, flash, redirect
 import mysql.connector
-import json
-
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'palavra-secreta123'
 
 @app.route('/acesso')
 def acesso():
+    if request.args.get('userName')==None:
+        flash('Rota protegida, faça o login pra continuar')
+        return redirect('/login')
+ 
     return render_template('html/acesso.html', userName=request.args.get('userName'))
 
 @app.route('/cadastro', methods=["GET", "POST"])
@@ -19,12 +21,22 @@ def cadastro():
         user = request.form.get('user')
         password = request.form.get('password')
 
-        comando = f'INSERT INTO usuario (user, password) VALUES ("{user}", "{password}")'
-
+        comando = f'SELECT * FROM usuario WHERE user="{user}"'
         cursor.execute(comando)
-        conexao.commit()
+        result = cursor.fetchall()
 
-        return redirect(f'/acesso?userName={user}')
+        if result:
+            flash('Usuário já cadastrado, escolha outro nome')
+            return redirect('/cadastro')
+        else:
+            comando = f'INSERT INTO usuario (user, password) VALUES ("{user}", "{password}")'
+
+            cursor.execute(comando)
+            conexao.commit()
+
+            return redirect(f'/acesso?userName={user}')
+
+        
 
 
 
@@ -62,10 +74,8 @@ if __name__ in '__main__':
     conexao = mysql.connector.connect(host="localhost", user="root", password="1234", database="flask")
     cursor = conexao.cursor()
 
-
-
-
     app.run(debug=True)
+    
     cursor.close()
     conexao.close()
 

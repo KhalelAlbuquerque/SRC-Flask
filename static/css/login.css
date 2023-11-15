@@ -1,0 +1,41 @@
+@charset "utf-8";
+
+
+
+body{
+    background-color: #ddd;
+    display: flex;
+    align-items: center;
+}
+
+#container-login{
+    width: 30%;
+    height: 200px;
+    margin: auto;
+    padding: 40px;
+}
+
+#container-login form section{
+    padding: 20px;
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid black;
+    gap: 30px;
+    border-radius: 20px;
+}
+
+#btn-entrar{
+    padding: 10px 30px;
+    background-color: rgb(106, 253, 197);
+    cursor: pointer;
+}
+
+
+#alerta{
+    color: red;
+    font-size: 20px;
+    font-weight: bold;
+}
