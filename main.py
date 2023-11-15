@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, flash, redirect
 import mysql.connector
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
+bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'palavra-secreta123'
 
 @app.route('/acesso')
@@ -29,7 +31,8 @@ def cadastro():
             flash('Usuário já cadastrado, escolha outro nome')
             return redirect('/cadastro')
         else:
-            comando = f'INSERT INTO usuario (user, password) VALUES ("{user}", "{password}")'
+            hashedPass = bcrypt.generate_password_hash(password).decode('utf-8')
+            comando = f'INSERT INTO usuario (user, password) VALUES ("{user}", "{hashedPass}")'
 
             cursor.execute(comando)
             conexao.commit()
@@ -55,10 +58,9 @@ def login():
         if result:
             dbUser = result[0][1]
             dbPass = result[0][2]
-
-            if senha == dbPass:
+            print(senha, dbPass)
+            if bcrypt.check_password_hash(dbPass, senha):
                 return redirect(f'/acesso?userName={dbUser}')
-            
             else:
                 flash('Usuário não encontrado. Verifique suas credenciais.')
                 return redirect('/login')
