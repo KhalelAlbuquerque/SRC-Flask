@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Flask</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/login.css')}}">
+</head>
+<body>
+    <div id="container-login">
+        <form action="/cadastro" method="post">
+            <section>
+                <div>
+                    <h1>Cadastro Flask</h1>
+                    {% set mensagens = get_flashed_messages() %}
+                    {% if mensagens %}
+                        <div id="alerta">
+                            {{mensagens[0]}}
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="user">Nome</label>
+                    <input type="text" placeholder="Digite seu nome" id="user" name="user">
+                </div>
+                <div style="display: flex; flex-direction: column;">
+                    <label for="password">Senha</label>
+                    <input type="password" placeholder="Digite sua senha" id="password" name="password">
+                </div>
+                <button type="submit" value="Cadastrar" id="btn-entrar">Cadastrar</button>
+                <a href='/'>Login</a>
+            </section>
+        </form>
+    </div>
+</body>
+</html>
