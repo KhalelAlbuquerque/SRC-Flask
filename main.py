@@ -6,10 +6,6 @@ import json
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'palavra-secreta123'
 
-@app.route('/')
-def home():
-    return render_template('html/login.html')
-
 @app.route('/acesso')
 def acesso():
     return render_template('html/acesso.html', userName=request.args.get('userName'))
@@ -32,19 +28,31 @@ def cadastro():
 
 
 
-@app.route('/login', methods=["POST"])
+@app.route('/login', methods=["GET","POST"])
 def login():
-    usuario = request.form.get('user')
-    senha = request.form.get('password')
+    if request.method == "GET":
+        return render_template('html/login.html')
+    elif request.method == "POST":
+        usuario = request.form.get('user')
+        senha = request.form.get('password')
 
-    with open('usuarios.json') as f:
-        lista = json.load(f)
-        for c in lista:
-            if c['nome'] == usuario and c['senha'] == senha:
-                return redirect(f'/acesso?userName={c["nome"]}')
+        comando = f'SELECT * FROM usuario WHERE user="{usuario}"'
+        cursor.execute(comando)
+        result = cursor.fetchall()
 
-            flash('Login invalido')
-            return redirect('/')
+        if result:
+            dbUser = result[0][1]
+            dbPass = result[0][2]
+
+            if senha == dbPass:
+                return redirect(f'/acesso?userName={dbUser}')
+            
+            else:
+                flash('Usuário não encontrado. Verifique suas credenciais.')
+                return redirect('/login')
+        else:
+            flash('Usuário não encontrado. Verifique suas credenciais.')
+            return redirect('/login')
 
 
 
