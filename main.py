@@ -1,18 +1,22 @@
-from flask import Flask, render_template, request, flash, redirect
+from flask import Flask, render_template, request, flash, redirect, abort, session
 import mysql.connector
 from flask_bcrypt import Bcrypt
+from flask_session import Session
 
 app = Flask(__name__)
-bcrypt = Bcrypt(app)
 app.config['SECRET_KEY'] = 'palavra-secreta123'
+app.config['SESSION_TYPE'] = 'filesystem'
+
+bcrypt = Bcrypt(app)
+Session(app)
 
 @app.route('/acesso')
 def acesso():
-    if request.args.get('userName')==None:
+    if 'username' not in session:
         flash('Rota protegida, faça o login pra continuar')
         return redirect('/login')
  
-    return render_template('html/acesso.html', userName=request.args.get('userName'))
+    return render_template('html/acesso.html', userName=session["username"])
 
 @app.route('/cadastro', methods=["GET", "POST"])
 def cadastro():
@@ -37,7 +41,8 @@ def cadastro():
             cursor.execute(comando)
             conexao.commit()
 
-            return redirect(f'/acesso?userName={user}')
+            session['username'] = user
+            return redirect(f'/acesso?userName={session["username"]}')
 
         
 
@@ -58,8 +63,9 @@ def login():
         if result:
             dbUser = result[0][1]
             dbPass = result[0][2]
-            print(senha, dbPass)
             if bcrypt.check_password_hash(dbPass, senha):
+                session['username'] = usuario
+                print(session)
                 return redirect(f'/acesso?userName={dbUser}')
             else:
                 flash('Usuário não encontrado. Verifique suas credenciais.')
