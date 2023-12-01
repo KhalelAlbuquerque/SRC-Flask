@@ -45,6 +45,33 @@ def cadastro():
             return redirect(f'/acesso?userName={session["username"]}')
 
         
+@app.route('/info')
+def info():
+    name = request.args.get('name')
+
+    try:
+        # Reabrir a conexão e criar um novo cursor
+        connection = mysql.connector.connect(user='root', password='1234', host='localhost', database='flask')
+        cursor = connection.cursor()
+
+        comando = f'SELECT * FROM usuario WHERE user="{name}"'
+        cursor.execute(comando)
+
+        result = cursor.fetchall()
+        print(result)
+        
+    except mysql.connector.Error as e:
+        print(f"Erro na consulta SQL: {e}")
+
+    finally:
+        # Fechar o cursor e a conexão, mesmo em caso de exceção
+        if 'cursor' in locals() and cursor is not None:
+            cursor.close()
+        if 'connection' in locals() and connection is not None:
+            connection.close()
+
+    return render_template('html/info.html', userName=name)
+
 
 
 
@@ -59,6 +86,9 @@ def login():
         comando = f'SELECT * FROM usuario WHERE user="{usuario}"'
         cursor.execute(comando)
         result = cursor.fetchall()
+
+        # sql injection
+        # senha = '" OR "1"="1"; -- '
 
         if result:
             dbUser = result[0][1]
@@ -82,7 +112,7 @@ if __name__ in '__main__':
     conexao = mysql.connector.connect(host="localhost", user="root", password="1234", database="flask")
     cursor = conexao.cursor()
 
-    app.run(debug=True)
+    app.run(debug=True, port=3000, host='0.0.0.0')
     
     cursor.close()
     conexao.close()
