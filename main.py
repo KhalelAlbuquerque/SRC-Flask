@@ -47,14 +47,15 @@ def cadastro():
         
 @app.route('/info')
 def info():
-    name = request.args.get('name')
+    id = request.args.get('id')
+    print(request.args)
 
     try:
         # Reabrir a conexão e criar um novo cursor
         connection = mysql.connector.connect(user='root', password='1234', host='localhost', database='flask')
         cursor = connection.cursor()
 
-        comando = f'SELECT * FROM usuario WHERE user="{name}"'
+        comando = f'SELECT * FROM usuario WHERE idUsuario="{id}"'
         cursor.execute(comando)
 
         result = cursor.fetchall()
@@ -70,7 +71,7 @@ def info():
         if 'connection' in locals() and connection is not None:
             connection.close()
 
-    return render_template('html/info.html', userName=name)
+    return render_template('html/info.html', userName=id)
 
 
 

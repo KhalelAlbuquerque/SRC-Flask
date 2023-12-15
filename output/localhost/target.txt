@@ -1,0 +1,1 @@
+http://localhost:3000/info?login=admin (GET)  # C:\Users\Cliente\Desktop\sqlmapproject-sqlmap-f176266\sqlmap.py -u http://localhost:3000/info?login=admin --batch --level 5 --risk 3 --output-dir=output/ --dbms=mysql
